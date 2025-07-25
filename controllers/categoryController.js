@@ -1,4 +1,5 @@
 const categoryModel = require('../models/Category');
+const newsModel = require('../models/News');
 const createError = require('../utils/error-message');
 const { validationResult} = require('express-validator');
 
@@ -66,19 +67,24 @@ const updateCategory = async (req, res, next) => {
     // implement validation
     const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.render('admin/categories/create', {
+            const category = await categoryModel.findById(id);
+            return res.render('admin/categories/update', {
+                category,
                 role: req.role,
                 errors: errors.array()
             })
         }
     try{
-        const category = await categoryModel.findByIdAndUpdate(id, req.body)
+        const category = await categoryModel.findById(id);
         if(!category){
             return next(createError('Category not found', 404));
         }
 
-        res.redirect('/admin/category');
+        category.name = req.body.name;
+        category.descripton = req.body.descripton;
 
+        await category.save();
+        res.redirect('/admin/category');
     }catch(error){
         // console.log(error);
         // res.status(500).send(error);
@@ -90,13 +96,19 @@ const updateCategory = async (req, res, next) => {
 const deleteCategory = async (req, res) => {
     const id = req.params.id;
     try{
-        const category = await categoryModel.findByIdAndDelete(id);
+        const category = await categoryModel.findById(id);
         if(!category){
             return next(createError('Category not found', 404));
         }
 
-        res.json({success:true});
+        const article = await newsModel.findOne({ category:id});
+        if(article) {
+            return res.status(400).json({success:false, message:'Category is associated with an article'});
+            // return next(createError('Category has articles', 400));
+        }
 
+        await category.deleteOne();
+        res.json({success:true});
     }catch(error){
         res.status(400).send(error);
     }

@@ -20,8 +20,8 @@ router.post('/save-settings', isLoggedIn, isAdmin,upload.single('website_logo'),
 
 // User Crud routes
 router.get('/users', isLoggedIn, isAdmin, userController.allUser);
-router.get('/add-user',  isLoggedIn, isAdmin, inValid.UserValidation, userController.addUserPage);
-router.post('/add-user', isLoggedIn, isAdmin,  userController.addUser);
+router.get('/add-user',  isLoggedIn, isAdmin, userController.addUserPage);
+router.post('/add-user', isLoggedIn, isAdmin, inValid.UserValidation,  userController.addUser);
 router.get('/update-user/:id', isLoggedIn, isAdmin,  userController.updateUserPage);
 router.post('/update-user/:id',  isLoggedIn, isAdmin, inValid.UserUpdateValidation, userController.updateUser);
 router.delete('/delete-user/:id', isLoggedIn, isAdmin,  userController.deleteUser);

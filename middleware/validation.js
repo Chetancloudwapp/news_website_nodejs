@@ -82,12 +82,13 @@ const categoryValidation = [
         .trim()
         .notEmpty()
         .withMessage('Category name is required')
-        .isLength({ min:3, max:12})
+        .isLength({ min:3})
         .withMessage('Category name must be 5 to 25 characters long'),
 
     body('description')
-        .isLength({ min:3, max:12})
-        .withMessage('Description must be atleast 100 characters long'),
+        .isLength({ min:3})
+        // .isLength({ min:3, max:12})
+        .withMessage('Description must not be less than 3 characters'),
 ]
 
 // ARTICLE VALIDATION
@@ -111,19 +112,19 @@ const articleValidation = [
         .notEmpty()
         .withMessage('Category is required'),
 
-    body('image')
-        .custom((value, {req}) => {
-            if(!req.file) {
-                throw new Error('Image is required');
-            }
+    // body('image')
+    //     .custom((value, {req}) => {
+    //         if(!req.file) {
+    //             throw new Error('Image is required');
+    //         }
 
-            const allowedExtentions = ['.jpg', '.jpeg', '.png'];
-            const fileExtension = path.extname(req.file.originalname).toLowerCase();
-            if(!allowedExtentions.includes(fileExtension)) {
-                throw new Error('Invalid image format. Only jpg, jpeg and png are allowed');
-            }
-            return true;
-        })
+    //         const allowedExtentions = ['.jpg', '.jpeg', '.png'];
+    //         const fileExtension = path.extname(req.file.originalname).toLowerCase();
+    //         if(!allowedExtentions.includes(fileExtension)) {
+    //             throw new Error('Invalid image format. Only jpg, jpeg and png are allowed');
+    //         }
+    //         return true;
+    //     })
         
 ]
 

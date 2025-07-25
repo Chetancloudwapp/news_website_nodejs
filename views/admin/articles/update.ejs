@@ -9,7 +9,7 @@
             <h5 class="card-header">Update Article</h5>
             <div class="card-body">
                 <!-- Error message show here dynamically -->
-                
+                <%- include('../partials/error') %>
                 <!-- Form -->
                 <form action="/admin/update-article/<%= article.id %>" method="POST" enctype="multipart/form-data">
                 <div class="mb-3">

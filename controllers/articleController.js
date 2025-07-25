@@ -4,7 +4,7 @@ const userModel = require('../models/User');
 const fs = require('fs');
 const path = require('path');
 const createError = require('../utils/error-message');
-
+const { validationResult} = require('express-validator');
 
 // controller functions
 const allArticle = async (req, res, next) => {
@@ -28,11 +28,20 @@ const allArticle = async (req, res, next) => {
 // add article page
 const addArticlePage = async (req, res) => {
     const categories = await categoryModel.find();
-    res.render('admin/articles/create', {categories, role: req.role});
+    res.render('admin/articles/create', {categories, role: req.role, errors:0});
 }
 
 // store article
 const addArticle = async (req, res, next) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        const categories = await categoryModel.find();
+        return res.render('admin/articles/create', {
+            categories,
+            role: req.role,
+            errors:errors.array()
+        })
+    }
     try{
         const {title, content, category} = req.body;
         const article = new newsModel({
@@ -76,7 +85,7 @@ const updateArticlePage = async (req, res, next) => {
             }
         }
         const categories = await categoryModel.find();
-        res.render('admin/articles/update', {role: req.role, article, categories});
+        res.render('admin/articles/update', {role: req.role, article, categories, errors:0});
     }catch(error) {
         // console.log(error);
         // res.status(500).send('Article not found');
@@ -88,6 +97,16 @@ const updateArticlePage = async (req, res, next) => {
 // update article
 const updateArticle = async (req, res, next) => {
     const id = req.params.id;
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        const categories = await categoryModel.find();
+        return res.render('admin/articles/update', {
+            article:req.body,
+            categories,
+            role: req.role,
+            errors:errors.array()
+        })
+    }
     try{
         const { title, content, category} = req.body;
         const article = await newsModel.findById(id);

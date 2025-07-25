@@ -7,6 +7,7 @@ const categoryModel = require('../models/Category');
 const newsModel = require('../models/News');
 const settingModel = require('../models/Setting');
 const createError = require('../utils/error-message');
+const fs = require('fs');
 
 // .env ko use krne ke liye
 dotenv.config();
@@ -113,12 +114,34 @@ const saveSettings = async(req, res, next) => {
     const website_logo = req.file ? req.file.filename : null;
 
     try{
-        const settings = await settingModel.findOneAndUpdate(
-            {},
-            {website_title, website_logo, footer_description},
-            { new:true, upsert:true}
-        );
+        // const settings = await settingModel.findOneAndUpdate(
+        //     {},
+        //     {website_title, website_logo, footer_description},
+        //     { new:true, upsert:true}
+        // );
 
+        // delete image before update new image
+        let setting = await settingModel.findOne();
+        if(!setting) {
+            setting = new settingModel();
+        }
+
+        setting.website_title = website_title;
+        setting.footer_description = footer_description;
+
+        if(website_logo){
+            if(setting.website_logo) {
+                const logoPath = `./public/uploads/${setting.website_logo}`;
+                if(fs.existsSync(logoPath)) {
+                    fs.unlinkSync(logoPath);
+                }
+            }
+
+            setting.website_logo = website_logo;
+        }
+
+
+        await setting.save();
         res.redirect('/admin/settings');
 
     }catch(error) {
@@ -207,11 +230,18 @@ const updateUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
     const id = req.params.id
     try{
-        const user = await userModel.findByIdAndDelete(id) // with the help of mongoose command
+        // const user = await userModel.findByIdAndDelete(id) // with the help of mongoose command
+        const user = await userModel.findById(id)
         if(!user){
             return next(createError('User not found', 404));
         }
 
+        const article = await newsModel.findOne({ author: id});
+        if(article) {
+            return res.status(400).json({success:false, message:'User is associated with an article you cannot delete them'});
+        }
+
+        await user.deleteOne();
         res.json({success:true});
         // await user.remove() // manually delete method 
     }catch(error){
