@@ -12,6 +12,9 @@ const router = express.Router();
 
 /* ----------- OR WE CAN ALSO WRITE THAT IN SHORT WAY ---------- */
 const siteController = require('../controllers/siteController');
+const loadCommonData = require('../middleware/loadCommonData');
+
+router.use(loadCommonData); // iske help se hume har route mai manually middleware ko add nahi krna pdega iske below sabhi route pr middleware automatically implement hoga
 
 // routes
 router.get('/', siteController.index);

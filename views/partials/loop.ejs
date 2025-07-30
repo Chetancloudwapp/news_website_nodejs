@@ -1,4 +1,4 @@
-<% newsData.forEach(function(article) { %>
+<% news.data.forEach(function(article) { %>
     <div class="post-content">
         <div class="row">
         <div class="col-md-4">
@@ -30,18 +30,40 @@
         </div>
     </div>
 <% }) %>
+<!-- concatinate search query with pagination -->
+<% 
+    function buildQuery(query, page) {
+        const params = new URLSearchParams(query);
+        params.set('page', page);
+        return '?' + params.toString();
+    }
+%>
 <nav>
-<ul class="pagination">
-    <li class="page-item disabled">
-    <a class="page-link">Previous</a>
-    </li>
-    <li class="page-item"><a class="page-link" href="#">1</a></li>
-    <li class="page-item active">
-    <a class="page-link" href="#" aria-current="page">2</a>
-    </li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
-    <li class="page-item">
-    <a class="page-link" href="#">Next</a>
-    </li>
-</ul>
+    <ul class="pagination">
+        <% if(news.hasPrevPage) { %>
+            <li class="page-item">
+                <a class="page-link" href="<%= buildQuery(query, news.prevPage) %>">Previous</a>
+            </li>
+        <% } else { %>
+            <li class="page-item disabled">
+                <a class="page-link">Previous</a>
+            </li>
+        <% } %>
+
+        <% for(let page = 1; page <= news.totalPages; page++) { %>
+            <li class="page-item <%= (page === news.currentPage) ? 'active' : '' %>">
+                <a class="page-link" href="<%= buildQuery(query, page) %>"><%= page %></a>
+            </li>
+        <% } %>
+
+        <% if(news.hasNextPage) { %>
+            <li class="page-item">
+                <a class="page-link" href="<%= buildQuery(query, news.nextPage) %>">Next</a>
+            </li>
+        <% } else { %>
+            <li class="page-item disabled">
+                <a class="page-link">Next</a>
+            </li>
+        <% } %>
+    </ul>
 </nav>
