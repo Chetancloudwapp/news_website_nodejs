@@ -106,7 +106,11 @@ const singleArticle = async(req, res) => {
     newsData.contentPlain = striptags(newsData.content).substring(0, 200) + '...';
     newsData.createdAtFormatted = moment(newsData.createdAt).format('D MMMM YYYY');
 
-    res.render('single', {newsData});
+    // GET ALL COMMENTS DATA FOR THIS ARTICLE
+    const comments = await commentModel.find({ article: req.params.id, status:'approved'})
+                                       .sort('-createdAt');
+
+    res.render('single', {newsData, comments});
 }
 
 // search article
@@ -185,7 +189,19 @@ const author = async(req, res) => {
     res.render('author', {news, author, query:req.query});
 }
 
-const addComment = async(req, res) => {}
+// add comment
+const addComment = async(req, res) => {
+    try{
+        // return res.json("Hello from comment");
+        const { name, email, content } = req.body;
+        const comment = new commentModel({ name, email, content, article: req.params.id});
+        await comment.save();
+    
+        res.redirect(`/single/${req.params.id}`);
+    }catch(error) {
+        res.status(500).send('Error adding comment');
+    }
+}
 
 module.exports = {
     index,

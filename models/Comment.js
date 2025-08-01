@@ -23,7 +23,9 @@ const commentSchema = new mongoose.Schema({
         enum:['pending','approved','rejected'],
         default:'pending',
         required:true
-    }
+    },   
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('Comment', commentSchema);

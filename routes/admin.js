@@ -44,6 +44,8 @@ router.delete('/delete-article/:id', isLoggedIn, articleController.deleteArticle
 
 // Comment routes
 router.get('/comments', isLoggedIn, commentController.allComments);
+router.put('/update-comment-status/:id', isLoggedIn, commentController.updateCommentStatus);
+router.delete('/delete-comment/:id', isLoggedIn, commentController.deleteComment);
 
 // Error Handling Middleware (404 Middleware)
 // Yhh middleware tab kaam karega jab koi route humare server pr nahi hai
